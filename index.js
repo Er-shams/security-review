@@ -1,26 +1,39 @@
 const express = require('express');
-const { WorkOS } = require('@workos-inc/node');
-
-
 const app = express();
+const ejs = require("ejs")
+const bodyParser = require('body-parser');
+const { response } = require('express');
+const urlencodedParser = bodyParser.urlencoded({ extended: false })
 
+app.get("/",(req,res) => {
+    res.send(`
+    <html>
+        <body>
+            <form action="/" method="get">
+                <input type="text" name="age" value="" />
+                <input type="submit" value="submit"/>
+            </form>
+        </body>
+    </html>
+`)
+})
 
-const workos = new WorkOS(process.env.WORKOS_API_KEY);
-const clientID = process.env.WORKOS_CLIENT_ID;
+app.post("/",urlencodedParser,(req,res) => {
+    response = {
+        age:req.body.age
+     };
+     const template = `
+     <html>
+        <body>
+            <p>
+                your age is ${age}
+            </p>
+        </body>
+     </html>
+     `
 
+     ejs.render(template,{age:response.age})
+})
 
-app.get('/auth', (_req, res) => {
-  const connection = 'connection_123'; // The Connection's ID
-  const redirectURI = 'https://dashboard.my-app.com'; // The callback URI WorkOS should redirect to post-authentication
+app.listen(8080)
 
-
-  const authorizationURL = workos.sso.getAuthorizationURL({
-    connection,
-    clientID,
-    redirectURI,
-  });
-
-
-  res.redirect(authorizationURL);
-});
- 
